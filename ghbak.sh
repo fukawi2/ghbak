@@ -60,8 +60,12 @@ absolute_backup_dir=$(cd $BACKUP_DIR && pwd)
 [[ -z "$GITHUB_TOKEN" ]]	&& warn 'User API Token not configured; Private Repositories will NOT be backed up'
 
 # Fetch a list of repos for $GITHUB_USER
-repos=$(curl --silent -i -u "${GITHUB_USER}/token:${GITHUB_TOKEN}" \
-	https://github.com/api/v2/$API_FORMAT/repos/show/${GITHUB_USER} | grep -F ':name:' | awk '{ print $2 }')
+echo "Fetching list of repositories for user '$GITHUB_USER'"
+github_uri="https://github.com/api/v2/$API_FORMAT/repos/show/${GITHUB_USER}"
+repos=$(curl --silent -i $github_uri | grep -F ':name:' | awk '{ print $2 }')
+# TODO: Login to list private repos
+#github_auth="${GITHUB_USER}/token:${GITHUB_TOKEN}"
+#repos=$(curl --silent -i -u $github_auth $github_uri | grep -F ':name:' | awk '{ print $2 }')
 
 # TODO: Handle multiple pages of repos:
 # X-Next: http://github.com/api/v2/yaml/repos/show/schacon?page=2
@@ -83,6 +87,8 @@ for repo_name in $repos ; do
 		# New Repo; Clone it
 		echo "===> Found new repository '$repo_name'; Cloning to $clone_name/"
 		git clone --mirror --quiet git://github.com/${GITHUB_USER}/${repo_name}.git $clone_name/
+		# TODO: Clone private repos
+		# git clone --mirror --quiet git@github.com:${GITHUB_USER}/${repo_name}.git $clone_name/
 		[[ $? -ne 0 ]] && warn "Failed to clone '$repo_name' to '${clone_name}/'"
 	else
 		# Existing; Fetch changes
