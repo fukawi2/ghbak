@@ -27,6 +27,8 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+export PATH='/usr/bin:/usr/sbin:/bin:/sbin'
+
 API_FORMAT='yaml'	# Do Not Change This
 
 ########################
@@ -48,7 +50,6 @@ function bomb() {
 ########################
 # MAIN
 ########################
-export PATH='/usr/bin:/usr/sbin:/bin:/sbin'
 
 # Find and load configuration file
 possible_rc_paths=( "$HOME/.ghbakrc" "/etc/ghbak.rc" "$(dirname $0)/ghbak.rc" )
