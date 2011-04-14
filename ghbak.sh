@@ -58,7 +58,7 @@ function cleanup() {
 ########################
 
 # Find and load configuration file
-possible_rc_paths=( "$HOME/.ghbakrc" "/etc/ghbak.rc" "$(dirname $0)/ghbak.rc" )
+possible_rc_paths=( "$1" "$HOME/.ghbakrc" "/etc/ghbak.rc" "$(dirname $0)/ghbak.rc" )
 for x in ${possible_rc_paths[@]} ; do
 	# Yeah, I know $x is poor variable naming, but fuckit, I'm too tired to
 	# think of anything better. Need more caffiene.
