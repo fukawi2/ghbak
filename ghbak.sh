@@ -76,6 +76,7 @@ done
 [[ ! -d "$BACKUP_DIR" ]] 	&& { mkdir -p $BACKUP_DIR || exit 1; }
 absolute_backup_dir=$(cd $BACKUP_DIR && pwd)
 [[ -z "$absolute_backup_dir" ]] && { echo "Failed to obtain absolute path for '$BACKUP_DIR'"; exit 1; }
+BACKUP_DIR="$absolute_backup_dir"
 
 # Fetch a list of repos for $GITHUB_USER
 echo "Fetching list of repositories for user '$GITHUB_USER'"
@@ -93,7 +94,6 @@ echo "Backup location is '$absolute_backup_dir/'"
 echo "Found $(wc -w <<< $repos) repositories to backup"
 
 # Loop through the found repos and 'clone' or 'fetch' as appropriate
-#for r in $repos ; do
 for repo_name in $repos ; do
 	[[ -z "$repo_name" ]] && continue
 	for excl in $EXCLUDE ; do
