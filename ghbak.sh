@@ -45,6 +45,7 @@ function warn() {
 function bomb() {
 	local _msg="$*"
 	[[ -n "$_msg" ]] && echo "FATAL: $_msg" >&2
+	rm -f "$BACKUP_DIR/.*.tar.bz2.*"	# Cleanup incomplete tarballs
 	exit 1
 }
 
@@ -110,12 +111,15 @@ for repo_name in $repos ; do
 		[[ $? -ne 0 ]] && warn "Failed to fetch changes in '$repo_name' (Path: ${clone_name}/)"
 	fi
 
+	tarball_temp=".$clone_name.tar.bz2.$$"
 	tarball_daily="$clone_name-$(date +%a).tar.bz2"
 	tarball_month="$clone_name-$(date +%y%m).tar.bz2"
 	echo -e "\tCreating tarball copy '$tarball_daily'"
 	cd $absolute_backup_dir && (
-		tar cjpf "$tarball_daily" $clone_name/
-		ln -f $tarball_daily $tarball_month
+		tar cjpf "$tarball_temp" $clone_name/ && (
+			mv -f "$tarball_temp" "$tarball_daily"
+			ln -f "$tarball_daily" "$tarball_month"
+		)
 	)
 done
 
