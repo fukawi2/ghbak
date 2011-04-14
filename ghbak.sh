@@ -27,9 +27,6 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-BACKUP_DIR='test-backups'
-GITHUB_USER='fukawi2'
-GITHUB_TOKEN=''	# Obtain your key from 'Account Settings' => 'Account Admin'
 API_FORMAT='yaml'	# Do Not Change This
 
 ########################
@@ -53,12 +50,25 @@ function bomb() {
 ########################
 export PATH='/usr/bin:/usr/sbin:/bin:/sbin'
 
+# Find and load configuration file
+possible_rc_paths=( "$HOME/.ghbakrc" "/etc/ghbak.rc" "$(dirname $0)/ghbak.rc" )
+for x in ${possible_rc_paths[@]} ; do
+	# Yeah, I know $x is poor variable naming, but fuckit, I'm too tired to
+	# think of anything better. Need more caffiene.
+	if [[ -e "$x" ]] ; then
+		rc_file="$x"
+	fi
+done
+[[ -z "$rc_file" ]] && bomb "Unable to locate configuration file"
+[[ -r "$rc_file" ]] && source "$rc_file" || bomb "Unable to read configuration file: $rc_file"
+
 # Sanity Checks
-[[ ! -d "$BACKUP_DIR" ]] && { mkdir -p $BACKUP_DIR || exit 1; }
+[[ -z "$GITHUB_USER" ]]		&& bomb 'GitHub username not configured'
+[[ -z "$GITHUB_TOKEN" ]]	&& warn 'User API Token not configured; Private Repositories will NOT be backed up'
+[[ -z "$BACKUP_DIR" ]]		&& bomb "BACKUP_DIR not configured in $rc_file"
+[[ ! -d "$BACKUP_DIR" ]] 	&& { mkdir -p $BACKUP_DIR || exit 1; }
 absolute_backup_dir=$(cd $BACKUP_DIR && pwd)
 [[ -z "$absolute_backup_dir" ]] && { echo "Failed to obtain absolute path for '$BACKUP_DIR'"; exit 1; }
-[[ -z "$GITHUB_USER" ]]	&& bomb 'GitHub username not configured'
-[[ -z "$GITHUB_TOKEN" ]]	&& warn 'User API Token not configured; Private Repositories will NOT be backed up'
 
 # Fetch a list of repos for $GITHUB_USER
 echo "Fetching list of repositories for user '$GITHUB_USER'"

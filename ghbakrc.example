@@ -1,0 +1,11 @@
+# Where to keep the backups
+BACKUP_DIR='/tmp'
+
+# Username that you want to backup repos of
+GITHUB_USER=''
+
+# Obtain your key from 'Account Settings' => 'Account Admin'
+GITHUB_TOKEN=''
+
+# Exclusions that you don't want to backup
+EXCLUDE='stupid-repo'
