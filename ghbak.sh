@@ -96,6 +96,10 @@ for repo_name in $repos ; do
 		cd ${clone_name} && git fetch --quiet --all --prune
 		[[ $? -ne 0 ]] && warn "Failed to fetch changes in '$repo_name' (Path: ${clone_name}/)"
 	fi
+
+	echo -e "\tCreating tarball copy..."
+	cd $absolute_backup_dir || exit 1
+	tar cjpf "$clone_name-$(date +%s).tar.bz2" $clone_name/
 done
 
 exit 0
