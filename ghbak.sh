@@ -31,6 +31,25 @@ BACKUP_DIR='test-backups'
 GITHUB_USER='fukawi2'
 API_FORMAT='yaml'
 
+########################
+# FUNCTIONS
+########################
+
+function warn() {
+	local _msg="$*"
+	[[ -z "$_msg" ]] && return 1
+	echo "WARNING: $_msg" >&2
+}
+
+function bomb() {
+	local _msg="$*"
+	[[ -n "$_msg" ]] && echo "FATAL: $_msg" >&2
+	exit 1
+}
+
+########################
+# MAIN
+########################
 [[ ! -d "$BACKUP_DIR" ]] && { mkdir -p $BACKUP_DIR || exit 1; }
 absolute_backup_dir=$(cd $BACKUP_DIR && pwd)
 [[ -z "$absolute_backup_dir" ]] && { echo "Failed to obtain absolute path for '$BACKUP_DIR'"; exit 1; }
