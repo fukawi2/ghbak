@@ -118,16 +118,18 @@ for repo_name in $repos ; do
 		[[ $? -ne 0 ]] && warn "Failed to fetch changes in '$repo_name' (Path: ${clone_name}/)"
 	fi
 
-	tarball_temp=".$clone_name.tar.bz2.$$"
-	tarball_daily="$clone_name-$(date +%a).tar.bz2"
-	tarball_month="$clone_name-$(date +%y%m).tar.bz2"
-	echo -e "\tCreating tarball copy '$tarball_daily'"
-	cd $absolute_backup_dir && (
-		tar cjpf "$tarball_temp" $clone_name/ && (
-			mv -f "$tarball_temp" "$tarball_daily"
-			ln -f "$tarball_daily" "$tarball_month"
+	if [[ "$SKIP_ZIP" != '1' ]] ; then
+		tarball_temp=".$clone_name.tar.bz2.$$"
+		tarball_daily="$clone_name-$(date +%a).tar.bz2"
+		tarball_month="$clone_name-$(date +%y%m).tar.bz2"
+		echo -e "\tCreating tarball copy '$tarball_daily'"
+		cd $absolute_backup_dir && (
+			tar cjpf "$tarball_temp" $clone_name/ && (
+				mv -f "$tarball_temp" "$tarball_daily"
+				ln -f "$tarball_daily" "$tarball_month"
+			)
 		)
-	)
+	fi
 done
 
 exit 0
