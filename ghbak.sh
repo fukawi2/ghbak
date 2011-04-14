@@ -98,9 +98,13 @@ for repo_name in $repos ; do
 		[[ $? -ne 0 ]] && warn "Failed to fetch changes in '$repo_name' (Path: ${clone_name}/)"
 	fi
 
-	echo -e "\tCreating tarball copy..."
-	cd $absolute_backup_dir || exit 1
-	tar cjpf "$clone_name-$(date +%s).tar.bz2" $clone_name/
+	tarball_daily="$clone_name-$(date +%a).tar.bz2"
+	tarball_month="$clone_name-$(date +%y%m).tar.bz2"
+	echo -e "\tCreating tarball copy '$tarball_daily'"
+	cd $absolute_backup_dir && (
+		tar cjpf "$tarball_daily" $clone_name/
+		ln -f $tarball_daily $tarball_month
+	)
 done
 
 exit 0
