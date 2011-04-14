@@ -64,6 +64,7 @@ for x in ${possible_rc_paths[@]} ; do
 	# think of anything better. Need more caffiene.
 	if [[ -e "$x" ]] ; then
 		rc_file="$x"
+		break
 	fi
 done
 [[ -z "$rc_file" ]] && bomb "Unable to locate configuration file"
