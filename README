@@ -1,1 +1,9 @@
-TODO: Write README file
+1. Copy the example configuration file (ghbakrc.example) to one of the
+   following locatons:
+     ~/.ghbakrc
+	 /etc/ghbak.rc
+	 ./ghbak.rc
+2. Update the new configuration file with the location to store the backup
+   of your repositories (BACKUP_DIR) and your GitHub username (GITHUB_USER).
+   Optionally, add a space separated list of repositories to skip (EXCLUDE).
+3. Set a cronjob to execute the 'ghbak.sh' script hourly/daily/whatever.
