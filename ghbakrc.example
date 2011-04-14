@@ -5,7 +5,9 @@ BACKUP_DIR='/tmp'
 GITHUB_USER=''
 
 # Obtain your key from 'Account Settings' => 'Account Admin'
-GITHUB_TOKEN=''
+# NOTE: This currently isn't used. Set it non-empty to avoid
+#       warning messages though.
+GITHUB_TOKEN='na'
 
 # Exclusions that you don't want to backup
 EXCLUDE='stupid-repo'
