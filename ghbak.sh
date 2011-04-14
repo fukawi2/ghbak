@@ -28,7 +28,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 export PATH='/usr/bin:/usr/sbin:/bin:/sbin'
-trap "bomb 'User aborted'" EXIT
+trap "cleanup" EXIT
 
 API_FORMAT='yaml'	# Do Not Change This
 
@@ -45,8 +45,12 @@ function warn() {
 function bomb() {
 	local _msg="$*"
 	[[ -n "$_msg" ]] && echo "FATAL: $_msg" >&2
-	rm -f "$BACKUP_DIR/.*.tar.bz2.*"	# Cleanup incomplete tarballs
 	exit 1
+}
+
+function cleanup() {
+	# Cleanup incomplete tarballs
+	rm -f $BACKUP_DIR/.*.tar.bz2.*
 }
 
 ########################
