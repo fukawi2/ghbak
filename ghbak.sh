@@ -28,6 +28,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 export PATH='/usr/bin:/usr/sbin:/bin:/sbin'
+trap "bomb 'User aborted'" EXIT
 
 API_FORMAT='yaml'	# Do Not Change This
 
