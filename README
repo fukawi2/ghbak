@@ -1,6 +1,6 @@
 1. Copy the example configuration file (ghbakrc.example) to one of the
    following locatons:
-     ~/.ghbakrc
+	 ~/.ghbakrc
 	 /etc/ghbak.rc
 	 ./ghbak.rc
 2. Update the new configuration file with the location to store the backup
