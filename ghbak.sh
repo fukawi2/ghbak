@@ -51,6 +51,7 @@ function bomb() {
 ########################
 # MAIN
 ########################
+export PATH='/usr/bin:/usr/sbin:/bin:/sbin'
 
 # Sanity Checks
 [[ ! -d "$BACKUP_DIR" ]] && { mkdir -p $BACKUP_DIR || exit 1; }
