@@ -92,6 +92,9 @@ echo "Found $(wc -w <<< $repos) repositories to backup"
 #for r in $repos ; do
 for repo_name in $repos ; do
 	[[ -z "$repo_name" ]] && continue
+	for excl in $EXCLUDE ; do
+		[[ "$excl" == "$repo_name" ]] && continue 2
+	done
 
 	# We don't want backups in dotdirs (hidden)
 	[[ ${repo_name:0:1} == '.' ]] && clone_name="${repo_name:1}" || clone_name="$repo_name"
