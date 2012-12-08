@@ -30,8 +30,6 @@
 export PATH='/usr/bin:/usr/sbin:/bin:/sbin'
 trap "cleanup" EXIT
 
-API_FORMAT='yaml'	# Do Not Change This
-
 ########################
 # FUNCTIONS
 ########################
@@ -70,6 +68,9 @@ done
 [[ -z "$rc_file" ]] && bomb "Unable to locate configuration file"
 [[ -r "$rc_file" ]] && source "$rc_file" || bomb "Unable to read configuration file: $rc_file"
 
+# dependency checks
+which jshon &> /dev/null || { echo "ERROR: jshon not found" >&2 ; exit 1; }
+
 # Sanity Checks
 [[ -z "$GITHUB_USER" ]]		&& bomb 'GitHub username not configured'
 [[ -z "$GITHUB_TOKEN" ]]	&& warn 'User API Token not configured; Private Repositories will NOT be backed up'
@@ -81,21 +82,23 @@ BACKUP_DIR="$absolute_backup_dir"
 
 # Fetch a list of repos for $GITHUB_USER
 echo "Fetching list of repositories for user '$GITHUB_USER'"
-github_uri="https://github.com/api/v2/$API_FORMAT/repos/show/${GITHUB_USER}"
-repos=$(curl --silent -i $github_uri | grep -F ':name:' | awk '{ print $2 }')
+github_uri="https://api.github.com/users/${GITHUB_USER}/repos"
+api_json=$(curl --silent $github_uri)
 # TODO: Login to list private repos
 #github_auth="${GITHUB_USER}/token:${GITHUB_TOKEN}"
 #repos=$(curl --silent -i -u $github_auth $github_uri | grep -F ':name:' | awk '{ print $2 }')
 
-# TODO: Handle multiple pages of repos:
-# X-Next: http://github.com/api/v2/yaml/repos/show/schacon?page=2
-# X-Last: http://github.com/api/v2/yaml/repos/show/schacon?page=3
-
 echo "Backup location is '$absolute_backup_dir/'"
-echo "Found $(wc -w <<< $repos) repositories to backup"
 
-# Loop through the found repos and 'clone' or 'fetch' as appropriate
-for repo_name in $repos ; do
+# Loop through each repository object in the returned json
+repo_count=$(echo "$api_json" | jshon -l)
+echo "Found $repo_count repositories to backup"
+for repo_num in $(eval echo "{1..$repo_count}"); do
+  # the final pipe in this chain is to 'xargs echo' as a sneaky way to unquote
+  # the json strings (jshon returns them with double quotes)
+  repo_name=$(echo "$api_json" | jshon -e $repo_num | jshon -e name | xargs echo )
+  repo_clone_src=$(echo "$api_json" | jshon -e $repo_num | jshon -e git_url | xargs echo )
+
 	[[ -z "$repo_name" ]] && continue
 	for excl in $EXCLUDE ; do
 		[[ "$excl" == "$repo_name" ]] && continue 2
@@ -108,7 +111,7 @@ for repo_name in $repos ; do
 	if [[ ! -d "${clone_name}" ]] ; then
 		# New Repo; Clone it
 		echo "===> Found new repository '$repo_name'; Cloning to $clone_name/"
-		git clone --mirror --quiet git://github.com/${GITHUB_USER}/${repo_name}.git $clone_name/
+		git clone --mirror --quiet "$repo_clone_src" $clone_name/
 		# TODO: Clone private repos
 		# git clone --mirror --quiet git@github.com:${GITHUB_USER}/${repo_name}.git $clone_name/
 		[[ $? -ne 0 ]] && warn "Failed to clone '$repo_name' to '${clone_name}/'"
